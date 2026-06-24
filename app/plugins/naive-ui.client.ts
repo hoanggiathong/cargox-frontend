@@ -1,46 +1,9 @@
-import {
-  create,
-  NButton,
-  NCard,
-  NConfigProvider,
-  NDataTable,
-  NDropdown,
-  NForm,
-  NFormItem,
-  NInput,
-  NLayout,
-  NLayoutContent,
-  NLayoutHeader,
-  NLayoutSider,
-  NMenu,
-  NMessageProvider,
-  NModal,
-  NNotificationProvider,
-  NSpin,
-} from 'naive-ui'
+import * as naive from 'naive-ui'
 
 export default defineNuxtPlugin((nuxtApp) => {
-  const naive = create({
-    components: [
-      NButton,
-      NCard,
-      NConfigProvider,
-      NDataTable,
-      NDropdown,
-      NForm,
-      NFormItem,
-      NInput,
-      NLayout,
-      NLayoutContent,
-      NLayoutHeader,
-      NLayoutSider,
-      NMenu,
-      NMessageProvider,
-      NModal,
-      NNotificationProvider,
-      NSpin,
-    ],
+  Object.entries(naive).forEach(([name, component]) => {
+    if (name.startsWith('N')) {
+      nuxtApp.vueApp.component(name, component as never)
+    }
   })
-
-  nuxtApp.vueApp.use(naive)
 })

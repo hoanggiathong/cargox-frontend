@@ -1,7 +1,13 @@
 <script setup lang="ts">
+import { useMessage } from 'naive-ui'
+import { useAuthStore } from '~/stores/auth.store'
+
 definePageMeta({
   layout: 'auth',
 })
+
+const authStore = useAuthStore()
+const message = useMessage()
 
 const form = reactive({
   phone: '',
@@ -10,12 +16,38 @@ const form = reactive({
 
 const loading = ref(false)
 
+const redirectByRole = async () => {
+  if (authStore.role === 'ADMIN') {
+    await navigateTo('/admin')
+    return
+  }
+
+  if (authStore.role === 'CARRIER' || authStore.role === 'DRIVER') {
+    await navigateTo('/carrier')
+    return
+  }
+
+  await navigateTo('/customer/orders')
+}
+
 const handleLogin = async () => {
+  if (!form.phone.trim() || !form.password.trim()) {
+    message.warning('Vui lòng nhập số điện thoại và mật khẩu')
+    return
+  }
+
   loading.value = true
 
   try {
-    // TODO: call API login
-    console.log('login payload', form)
+    await authStore.login({
+      phone: form.phone.trim(),
+      password: form.password,
+    })
+
+    message.success('Đăng nhập thành công')
+    await redirectByRole()
+  } catch {
+    message.error('Số điện thoại hoặc mật khẩu không đúng')
   } finally {
     loading.value = false
   }
