@@ -9,6 +9,7 @@ export const useOrderStore = defineStore('order', () => {
   const myOrders = ref<FreightOrder[]>([])
   const marketplaceOrders = ref<FreightOrder[]>([])
   const loading = ref(false)
+  const carrierOrders = ref<FreightOrder[]>([])
 
   const createOrder = async (payload: CreateFreightOrderPayload) => {
     loading.value = true
@@ -40,6 +41,29 @@ export const useOrderStore = defineStore('order', () => {
     }
   }
 
+  const fetchCarrierOrders = async () => {
+    loading.value = true
+
+    try {
+      carrierOrders.value = await orderService.getCarrierOrders()
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const updateOrderStatus = async (
+    id: string,
+    status: FreightOrder['status'],
+  ) => {
+    loading.value = true
+
+    try {
+      return await orderService.updateStatus(id, status)
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     myOrders,
     marketplaceOrders,
@@ -47,5 +71,8 @@ export const useOrderStore = defineStore('order', () => {
     createOrder,
     fetchMyOrders,
     fetchMarketplaceOrders,
+    carrierOrders,
+    fetchCarrierOrders,
+    updateOrderStatus,
   }
 })

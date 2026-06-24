@@ -7,6 +7,8 @@ export type OrderStatus =
   | 'WAITING_PICKUP'
   | 'PICKED_UP'
   | 'IN_TRANSIT'
+  | 'ARRIVED_DESTINATION'
+  | 'OUT_FOR_DELIVERY'
   | 'DELIVERED'
   | 'CANCELLED'
 
