@@ -4,12 +4,14 @@ import type {
   CreateFreightOrderPayload,
   FreightOrder,
 } from '~/types/order'
+import type { TrackingEvent } from '~/types/tracking'
 
 export const useOrderStore = defineStore('order', () => {
   const myOrders = ref<FreightOrder[]>([])
   const marketplaceOrders = ref<FreightOrder[]>([])
   const loading = ref(false)
   const carrierOrders = ref<FreightOrder[]>([])
+  const trackingEvents = ref<TrackingEvent[]>([])
 
   const createOrder = async (payload: CreateFreightOrderPayload) => {
     loading.value = true
@@ -51,14 +53,28 @@ export const useOrderStore = defineStore('order', () => {
     }
   }
 
+  const fetchTrackingEvents = async (id: string) => {
+    loading.value = true
+
+    try {
+      trackingEvents.value = await orderService.getTrackingEvents(id)
+    } finally {
+      loading.value = false
+    }
+  }
+
   const updateOrderStatus = async (
     id: string,
-    status: FreightOrder['status'],
+    payload: {
+      status: FreightOrder['status']
+      note?: string
+      location?: string
+    },
   ) => {
     loading.value = true
 
     try {
-      return await orderService.updateStatus(id, status)
+      return await orderService.updateStatus(id, payload)
     } finally {
       loading.value = false
     }
@@ -74,5 +90,7 @@ export const useOrderStore = defineStore('order', () => {
     carrierOrders,
     fetchCarrierOrders,
     updateOrderStatus,
+    trackingEvents,
+    fetchTrackingEvents,
   }
 })

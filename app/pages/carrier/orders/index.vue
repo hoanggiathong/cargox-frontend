@@ -6,6 +6,7 @@ import { NButton, NTag, NSpace } from 'naive-ui'
 
 import { useOrderStore } from '~/stores/order.store'
 import type { FreightOrder, OrderStatus } from '~/types/order'
+import { orderStatusLabels } from '~/constants/order-status'
 
 definePageMeta({
   layout: 'dashboard',
@@ -13,19 +14,6 @@ definePageMeta({
 
 const message = useMessage()
 const orderStore = useOrderStore()
-
-const statusLabels: Record<OrderStatus, string> = {
-  CREATED: 'Đã tạo',
-  WAITING_BID: 'Chờ báo giá',
-  BID_SELECTED: 'Đã chọn chành',
-  WAITING_PICKUP: 'Chờ lấy hàng',
-  PICKED_UP: 'Đã lấy hàng',
-  IN_TRANSIT: 'Đang vận chuyển',
-  ARRIVED_DESTINATION: 'Đã đến điểm giao',
-  OUT_FOR_DELIVERY: 'Đang giao hàng',
-  DELIVERED: 'Đã giao',
-  CANCELLED: 'Đã hủy',
-}
 
 const nextStatuses: Partial<Record<OrderStatus, OrderStatus>> = {
   BID_SELECTED: 'WAITING_PICKUP',
@@ -58,7 +46,11 @@ const handleUpdateStatus = async (row: FreightOrder) => {
   if (!nextStatus) return
 
   try {
-    await orderStore.updateOrderStatus(row._id, nextStatus)
+    await orderStore.updateOrderStatus(row._id, {
+      status: nextStatus,
+      note: orderStatusLabels[nextStatus],
+      location: `${row.pickupProvince} → ${row.deliveryProvince}`,
+    })
     message.success('Cập nhật trạng thái thành công')
     await orderStore.fetchCarrierOrders()
   } catch (error: any) {
@@ -106,7 +98,7 @@ const columns: DataTableColumns<FreightOrder> = [
           type: getStatusType(row.status),
         },
         {
-          default: () => statusLabels[row.status],
+          default: () => orderStatusLabels[row.status],
         },
       )
     },

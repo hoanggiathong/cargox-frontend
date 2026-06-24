@@ -8,6 +8,12 @@ import { orderService } from '~/services/order.service'
 import { useBidStore } from '~/stores/bid.store'
 import type { FreightOrder } from '~/types/order'
 import type { Bid } from '~/types/bid'
+import {
+  getOrderStatusIndex,
+  orderStatusFlow,
+  orderStatusLabels,
+} from '~/constants/order-status'
+import { useOrderStore } from '~/stores/order.store'
 
 definePageMeta({
   layout: 'dashboard',
@@ -16,6 +22,7 @@ definePageMeta({
 const route = useRoute()
 const message = useMessage()
 const bidStore = useBidStore()
+const orderStore = useOrderStore()
 
 const order = ref<FreightOrder | null>(null)
 const loading = ref(false)
@@ -107,6 +114,7 @@ const fetchData = async () => {
   try {
     order.value = await orderService.getById(orderId.value)
     await bidStore.fetchOrderBids(orderId.value)
+    await orderStore.fetchTrackingEvents(orderId.value)
   } finally {
     loading.value = false
   }
@@ -156,6 +164,32 @@ onMounted(fetchData)
         </NCard>
       </div>
     </NCard>
+
+    <NCard v-if="order" title="Tiến trình vận chuyển">
+      <NSteps
+        :current="getOrderStatusIndex(order.status) + 1"
+        :status="order.status === 'CANCELLED' ? 'error' : 'process'"
+      >
+        <NStep
+          v-for="status in orderStatusFlow"
+          :key="status"
+          :title="orderStatusLabels[status]"
+        />
+      </NSteps>
+    </NCard>
+
+    <NCard title="Lịch sử trạng thái">
+        <NTimeline>
+          <NTimelineItem
+            v-for="event in orderStore.trackingEvents"
+            :key="event._id"
+            type="info"
+            :title="orderStatusLabels[event.status]"
+            :content="event.note || event.location || '-'"
+            :time="new Date(event.createdAt).toLocaleString('vi-VN')"
+          />
+        </NTimeline>
+      </NCard>
 
     <NCard title="Danh sách báo giá">
       <NDataTable

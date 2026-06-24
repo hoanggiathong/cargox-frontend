@@ -3,6 +3,7 @@ import type { DataTableColumns } from 'naive-ui'
 import { NButton, NTag } from 'naive-ui'
 import { useOrderStore } from '~/stores/order.store'
 import type { FreightOrder } from '~/types/order'
+import { orderStatusLabels } from '~/constants/order-status'
 
 definePageMeta({
   layout: 'dashboard',
@@ -38,7 +39,7 @@ const columns: DataTableColumns<FreightOrder> = [
     title: 'Trạng thái',
     key: 'status',
     render(row) {
-      return h(NTag, { type: 'info' }, { default: () => row.status })
+      return h(NTag, { type: 'info' }, { default: () => orderStatusLabels[row.status] || row.status })
     },
   },
   {
