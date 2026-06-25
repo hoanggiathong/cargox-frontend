@@ -5,6 +5,7 @@ import {
   carrierMenuOptions,
   customerMenuOptions,
 } from '~/constants/menu'
+import { useNotificationStore } from '~/stores/notification.store'
 
 const authStore = useAuthStore()
 const route = useRoute()
@@ -19,6 +20,10 @@ const menuOptions = computed(() => {
 })
 
 const activeKey = computed(() => route.path)
+
+const notificationStore = useNotificationStore()
+
+const showNotifications = ref(false)
 
 const handleMenuSelect = (key: string) => {
   router.push(key)
@@ -53,7 +58,11 @@ const handleMenuSelect = (key: string) => {
         <div class="font-semibold">
           Nền tảng vận tải hàng hóa
         </div>
-
+        <NBadge :value="notificationStore.unreadCount" :max="99">
+          <NButton size="small" @click="showNotifications = true">
+            Thông báo
+          </NButton>
+        </NBadge>
         <div class="flex items-center gap-3">
           <span>{{ authStore.user?.fullName || 'User' }}</span>
           <NButton size="small" @click="authStore.logout">
@@ -67,4 +76,31 @@ const handleMenuSelect = (key: string) => {
       </NLayoutContent>
     </NLayout>
   </NLayout>
+
+  <NModal
+    v-model:show="showNotifications"
+    preset="card"
+    title="Thông báo"
+    style="width: 520px"
+  >
+    <div v-if="notificationStore.notifications.length === 0">
+      Chưa có thông báo
+    </div>
+
+    <div v-else class="space-y-2">
+      <NCard
+        v-for="item in notificationStore.notifications"
+        :key="item.createdAt"
+        size="small"
+      >
+        <div class="font-semibold">
+          {{ item.title }}
+        </div>
+        <div>{{ item.message }}</div>
+        <div class="text-xs text-gray-500">
+          {{ new Date(item.createdAt).toLocaleString('vi-VN') }}
+        </div>
+      </NCard>
+    </div>
+  </NModal>
 </template>
