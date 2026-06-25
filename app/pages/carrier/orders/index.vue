@@ -121,15 +121,28 @@ const columns: DataTableColumns<FreightOrder> = [
             h(
               NButton,
               {
-                type: 'primary',
                 size: 'small',
-                loading: orderStore.loading,
-                onClick: () => handleUpdateStatus(row),
+                onClick: () => navigateTo(`/carrier/orders/${row._id}`),
               },
               {
-                default: () => nextStatusButtonLabels[row.status],
+                default: () => 'Chi tiết',
               },
             ),
+
+            nextStatus
+              ? h(
+                  NButton,
+                  {
+                    type: 'primary',
+                    size: 'small',
+                    loading: orderStore.loading,
+                    onClick: () => handleUpdateStatus(row),
+                  },
+                  {
+                    default: () => nextStatusButtonLabels[row.status],
+                  },
+                )
+              : null,
           ],
         },
       )

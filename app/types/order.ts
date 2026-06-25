@@ -15,7 +15,23 @@ export type OrderStatus =
 export interface FreightOrder {
   _id: string
   code: string
-  customerId: string
+  customerId:
+  | string
+  | {
+      _id: string
+      fullName: string
+      phone: string
+      role: string
+    }
+
+  carrierId?:
+    | string
+    | {
+        _id: string
+        fullName: string
+        phone: string
+        role: string
+      }
 
   senderName: string
   senderPhone: string

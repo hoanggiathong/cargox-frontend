@@ -15,6 +15,7 @@ import {
 } from '~/constants/order-status'
 import { useOrderStore } from '~/stores/order.store'
 import { useSocket } from '~/composables/useSocket'
+import OrderChat from '~/components/chat/OrderChat.vue'
 
 definePageMeta({
   layout: 'dashboard',
@@ -31,6 +32,16 @@ const loading = ref(false)
 const orderId = computed(() => String(route.params.id))
 
 const { connectSocket } = useSocket()
+
+const chatReceiverId = computed(() => {
+  if (!order.value?.carrierId) return ''
+
+  if (typeof order.value.carrierId === 'string') {
+    return order.value.carrierId
+  }
+
+  return order.value.carrierId._id
+})
 
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('vi-VN').format(value) + ' VNĐ'
@@ -204,6 +215,12 @@ onMounted(async () => {
           />
         </NTimeline>
       </NCard>
+
+    <OrderChat
+      v-if="order && chatReceiverId && order.status !== 'WAITING_BID'"
+      :order-id="order._id"
+      :receiver-id="chatReceiverId"
+    />  
 
     <NCard title="Danh sách báo giá">
       <NDataTable

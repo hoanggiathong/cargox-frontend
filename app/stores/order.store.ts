@@ -12,12 +12,23 @@ export const useOrderStore = defineStore('order', () => {
   const loading = ref(false)
   const carrierOrders = ref<FreightOrder[]>([])
   const trackingEvents = ref<TrackingEvent[]>([])
+  const allOrders = ref<FreightOrder[]>([])
 
   const createOrder = async (payload: CreateFreightOrderPayload) => {
     loading.value = true
 
     try {
       return await orderService.create(payload)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const fetchAllOrders = async () => {
+    loading.value = true
+
+    try {
+      allOrders.value = await orderService.getAllOrders()
     } finally {
       loading.value = false
     }
@@ -92,5 +103,7 @@ export const useOrderStore = defineStore('order', () => {
     updateOrderStatus,
     trackingEvents,
     fetchTrackingEvents,
+    allOrders,
+    fetchAllOrders,
   }
 })

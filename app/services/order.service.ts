@@ -42,6 +42,12 @@ export const orderService = {
     return response.data
   },
 
+  async getAllOrders(): Promise<FreightOrder[]> {
+    const api = createApiClient()
+    const response = await api.get<FreightOrder[]>('/orders/admin/all')
+    return response.data
+  },
+
   async updateStatus(
     id: string,
     payload: {
