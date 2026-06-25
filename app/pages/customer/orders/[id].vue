@@ -14,6 +14,7 @@ import {
   orderStatusLabels,
 } from '~/constants/order-status'
 import { useOrderStore } from '~/stores/order.store'
+import { useSocket } from '~/composables/useSocket'
 
 definePageMeta({
   layout: 'dashboard',
@@ -28,6 +29,8 @@ const order = ref<FreightOrder | null>(null)
 const loading = ref(false)
 
 const orderId = computed(() => String(route.params.id))
+
+const { connectSocket } = useSocket()
 
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('vi-VN').format(value) + ' VNĐ'
@@ -120,7 +123,18 @@ const fetchData = async () => {
   }
 }
 
-onMounted(fetchData)
+onMounted(async () => {
+  await fetchData()
+
+  const socket = connectSocket()
+
+  socket.emit('join_order_room', orderId.value)
+
+  socket.on('order_status_updated', async (payload) => {
+    console.log('Realtime order_status_updated:', payload)
+    await fetchData()
+})
+})
 </script>
 
 <template>

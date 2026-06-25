@@ -43,15 +43,15 @@ export const orderService = {
   },
 
   async updateStatus(
-  id: string,
-  payload: {
-    status: FreightOrder['status']
-    note?: string
-    location?: string
+    id: string,
+    payload: {
+      status: FreightOrder['status']
+      note?: string
+      location?: string
+    },
+  ): Promise<FreightOrder> {
+    const api = createApiClient()
+    const response = await api.patch<FreightOrder>(`/orders/${id}/status`, payload)
+    return response.data
   },
-): Promise<FreightOrder> {
-  const api = createApiClient()
-  const response = await api.patch<FreightOrder>(`/orders/${id}/status`, payload)
-  return response.data
-},
 }

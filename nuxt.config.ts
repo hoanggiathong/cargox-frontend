@@ -20,14 +20,15 @@ export default defineNuxtConfig({
       include: ['naive-ui', 'vueuc'],
     },
   },
-  
+
   devServer: {
     port: 8080,
   },
 
   runtimeConfig: {
     public: {
-      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/api',
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api',
+      socketUrl: process.env.NUXT_PUBLIC_SOCKET_URL || 'http://localhost:3000',
     },
   },
 })
